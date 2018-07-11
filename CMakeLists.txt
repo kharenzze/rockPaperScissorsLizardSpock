@@ -3,4 +3,4 @@ project(rockPaperScissorsLizardSpock)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(rockPaperScissorsLizardSpock main.cpp)
+add_executable(rockPaperScissorsLizardSpock main.cpp Game.cpp Game.h)
