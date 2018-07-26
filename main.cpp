@@ -24,12 +24,14 @@ int getSocketPort(int socket) {
     socklen_t len;
     getsockname(socket, (struct sockaddr *)&address, &len);
     const auto p = ntohs(address.sin_port);
-    logPort(p);
     return p;
 }
 
+void clientTask() {
+
+}
+
 int client() {
-    struct sockaddr_in address;
     struct sockaddr_in serv_addr;
     const char *hello = "Hello from client";
     char buffer[BUFFER_LENGTH] = {0};
@@ -56,6 +58,7 @@ int client() {
     }
 
     int port = getSocketPort(sock);
+    logPort(port);
     send(sock , hello , strlen(hello) , 0 );
     return 0;
 }
