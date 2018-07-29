@@ -53,9 +53,13 @@ void clientTask(int sock) {
     std::cout << "Connection stablished:" << std::endl;
     while (play) {
         int option = selectHand();
-        send(sock, &option, sizeof(int), 0);
-        receiveGameState(&gs, sock);
-        play = !logGameState(gs);
+        if (option < 1 || option > 5) {
+            std::cout << "Wrong number! please, choose one of this options" << std::endl;
+        } else {
+            send(sock, &option, sizeof(int), 0);
+            receiveGameState(&gs, sock);
+            play = !logGameState(gs);
+        }
     }
 }
 
