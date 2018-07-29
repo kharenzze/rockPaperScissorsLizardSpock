@@ -54,7 +54,7 @@ inline const char* _winnerToText(winner w) {
 inline bool logGameState(struct gameState &s) {
     bool ended = false;
     if (s.winner != WINNER_NONE) {
-        std::cout << "Game finished! " << _winnerToText(s.winner) << "wins!" << std::endl;
+        std::cout << "Game finished! " << _winnerToText(s.winner) << " wins!" << std::endl;
         ended = true;
     } else {
         std::cout << _winnerToText(s.lastRoundWinner) << "wins! Round " << s.round << ". ";
