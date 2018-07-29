@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <cstdlib>
 #include <netinet/in.h>
+#include <thread>
 
 #include "Game.h"
 
@@ -53,7 +54,7 @@ void clientTask(int sock) {
     std::cout << "Connection stablished:" << std::endl;
     while (play) {
         int option = selectHand();
-        if (option < 1 || option > 5) {
+        if (option < 0 || option > 4) {
             std::cout << "Wrong number! please, choose one of this options" << std::endl;
         } else {
             send(sock, &option, sizeof(int), 0);
@@ -169,7 +170,8 @@ void server() {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-        serverGameTask(new_socket);
+        std::thread t(&serverGameTask, new_socket);
+        t.join();
     }
 
 }
