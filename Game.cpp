@@ -4,7 +4,7 @@
 
 #include "Game.h"
 
-int Game::winner() const {
+winner Game::winner() const {
     if (machine == MAX_VICTORIES) {
         return WINNER_MACHINE;
     } else if (player == MAX_VICTORIES) {
@@ -25,13 +25,13 @@ int Game::performRound(int machine, int player) {
     if (round >= MAX_ROUNDS) {
         return -1;
     }
-    round++;
+    this->round++;
     const auto roundWinner = playMap[machine][player];
     if (roundWinner == -1) {
-        machine++;
+        this->machine++;
         return WINNER_MACHINE;
     } else if (roundWinner == 1) {
-        player++;
+        this->player++;
         return WINNER_PLAYER;
     } else {
         return WINNER_DRAW;

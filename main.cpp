@@ -13,6 +13,8 @@
 #define SERVER_MODE "server"
 #define BUFFER_LENGTH 1024
 
+const char* HELLO_MESSAGE = "START_GAME";
+
 using std::string;
 
 void logPort(uint32_t port) {
@@ -27,13 +29,38 @@ int getSocketPort(int socket) {
     return p;
 }
 
-void clientTask() {
+int selectHand() {
+    std::cout << "Select an option: " << std::endl;
+    std::cout << "1 - Rock" << std::endl;
+    std::cout << "2 - Paper" << std::endl;
+    std::cout << "3 - Scissors" << std::endl;
+    std::cout << "4 - Lizard" << std::endl;
+    std::cout << "5 - Spock" << std::endl;
+    int option;
+    std::cin >> option;
+    return option - 1;
+}
 
+void receiveGameState(struct gameState *gs, int sock) {
+    char buffer[BUFFER_LENGTH];
+    read(sock, buffer, BUFFER_LENGTH);
+    memcpy(gs, buffer, sizeof(struct gameState));
+}
+
+void clientTask(int sock) {
+    struct gameState gs;
+    bool play = true;
+    std::cout << "Connection stablished:" << std::endl;
+    while (play) {
+        int option = selectHand();
+        send(sock, &option, sizeof(int), 0);
+        receiveGameState(&gs, sock);
+        play = !logGameState(gs);
+    }
 }
 
 int client() {
     struct sockaddr_in serv_addr;
-    const char *hello = "Hello from client";
     char buffer[BUFFER_LENGTH] = {0};
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
@@ -59,7 +86,7 @@ int client() {
 
     int port = getSocketPort(sock);
     logPort(port);
-    send(sock , hello , strlen(hello) , 0 );
+    clientTask(sock);
     return 0;
 }
 
@@ -98,10 +125,26 @@ int openServerPort(int port, struct sockaddr_in &address, socklen_t addr_len) {
 }
 
 void serverGameTask(int socket) {
-    Game game();
+    Game game;
     char buffer[BUFFER_LENGTH];
-    auto valRead = read(socket, buffer, BUFFER_LENGTH);
-    std::cout << buffer << std::endl;
+    hand playerHand, machineHand;
+    winner w = WINNER_NONE;
+    while (w == WINNER_NONE) {
+        auto valRead = read(socket, buffer, BUFFER_LENGTH);
+        memcpy(&playerHand, buffer, sizeof(int));
+        int machineHandInt = rand() % 5;
+        machineHand = static_cast<hand>(machineHandInt);
+        int roundWinner = game.performRound(machineHand, playerHand);
+        w = game.winner();
+        struct gameState gs;
+        gs.round = game.round;
+        gs.player = game.player;
+        gs.machine = game.machine;
+        gs.lastRoundWinner = static_cast<winner>(roundWinner);;
+        gs.winner = w;
+        send(socket, &gs, sizeof(struct gameState), 0);
+    }
+
 };
 
 void server() {
